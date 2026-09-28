@@ -1,0 +1,56 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+rust-version = "1.85"
+
+[workspace.dependencies]
+# ---- 内部 crate ----
+# 依赖图（M0 版本，后续按模块落地调整）：
+#   pi-types  ← 零内部依赖的契约层
+#   pi-ai     ← pi-types
+#   pi-session← pi-types
+#   pi-tools  ← pi-types
+#   pi-config ← 无
+#   pi-agent  ← pi-types + pi-ai
+#   pi-cli    ← pi-agent + pi-config
+pi-types = { path = "crates/pi-types", version = "0.1.0" }
+pi-ai = { path = "crates/pi-ai", version = "0.1.0" }
+pi-session = { path = "crates/pi-session", version = "0.1.0" }
+pi-tools = { path = "crates/pi-tools", version = "0.1.0" }
+pi-config = { path = "crates/pi-config", version = "0.1.0" }
+pi-agent = { path = "crates/pi-agent", version = "0.1.0" }
+
+# ---- 第三方 ----
+anyhow = "1"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = [
+    "rt-multi-thread",
+    "macros",
+    "sync",
+    "time",
+    "fs",
+    "io-util",
+    "process",
+    "signal",
+] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
